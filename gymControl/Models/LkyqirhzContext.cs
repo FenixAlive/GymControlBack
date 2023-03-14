@@ -69,6 +69,7 @@ public partial class LkyqirhzContext : DbContext
             entity.Property(e => e.Username)
                 .HasMaxLength(32)
                 .HasColumnName("username");
+
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -99,11 +100,8 @@ public partial class LkyqirhzContext : DbContext
                 .HasColumnType("character varying")
                 .HasColumnName("phone");
             entity.Property(e => e.Updated).HasColumnName("updated");
-
-            entity.HasOne(d => d.Partner).WithMany(p => p.Users)
-                .HasForeignKey(d => d.PartnerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_partner");
+            entity.Property(e => e.CaducateDate).HasColumnName("caducate_date");
+            entity.Property(e => e.userPass).HasColumnName("user_pass");
         });
 
         OnModelCreatingPartial(modelBuilder);

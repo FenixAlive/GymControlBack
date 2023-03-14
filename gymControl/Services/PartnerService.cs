@@ -2,15 +2,32 @@
 using gymControl.Models;
 using Microsoft.EntityFrameworkCore;
 
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace gymControl.Services
 {
     public class PartnerService: IPartnerService
     {
         private readonly LkyqirhzContext _context;
-        public PartnerService(LkyqirhzContext context)
+        private readonly IConfiguration _config;
+
+        public PartnerService(LkyqirhzContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;
+        }
+
+        public async Task<PartnerAuth> LoginPartner(LoginUser loginPartner)
+        {
+            var partner = await AuthenticatePartner(loginPartner.UserName, loginPartner.Password);
+            if (partner == null)
+            {
+                return null;
+            }
+            return new PartnerAuth() { token = GenerateToken(partner), data = partner };
         }
 
         public async Task<List<Partner>> GetPartners(PartnerQuery query)
@@ -24,9 +41,14 @@ namespace gymControl.Services
             return await partners.Select(v => new Partner() { Id = v.Id, Username = v.Username, Email = v.Email, Phone = v.Phone, Created = v.Created, Updated = v.Updated, Active = v.Active }).ToListAsync(); ;
         }
 
-        public async Task<Partner> GetPartner(string partnerId)
+        public async Task<Partner> GetPartner(int partnerId)
         {
-            return await _context.Partners.FindAsync(partnerId);
+            var partner = await _context.Partners.FindAsync(partnerId);
+            if(partner != null)
+            {
+                partner.Passwd = null;
+            }
+            return partner;
         }
 
         public async Task<Partner> AuthenticatePartner(string username, string passwd)
@@ -83,5 +105,25 @@ namespace gymControl.Services
             return partner;
         }
 
+        public string GenerateToken(Partner partner)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            // create claims
+            var claims = new[]
+            {
+                new Claim("id", partner.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, partner.Username),
+                new Claim(ClaimTypes.Email, partner.Email)
+            };
+            // create token
+            var token = new JwtSecurityToken(
+                _config["Jwt:Issuer"],
+                _config["Jwt:Audience"],
+                claims,
+                expires: DateTime.Now.AddHours(16),
+                signingCredentials: credentials);
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

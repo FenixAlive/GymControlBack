@@ -1,7 +1,12 @@
-﻿namespace gymControl.Services
+﻿
+
+using System.Security.Claims;
+
+namespace gymControl.Services
 {
     public class PasswdSecure
     {
+        
         public static string EncodePasswordToBase64(string password)
         {
             try
@@ -28,5 +33,6 @@
             string result = new(decoded_char);
             return result;
         }
+        
     }
 }

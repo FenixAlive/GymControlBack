@@ -5,9 +5,11 @@ namespace gymControl.Models;
 
 public partial class User
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
 
     public int PartnerId { get; set; }
+
+    public string? userPass { get; set; }
 
     public string? FirstName { get; set; }
 
@@ -21,13 +23,26 @@ public partial class User
 
     public int? MonthsPaid { get; set; }
 
-    public DateTime Created { get; set; }
+    public DateOnly? CaducateDate { get; set; }
+
+    public DateTime? Created { get; set; }
 
     public DateTime? Updated { get; set; }
 
     public bool? Active { get; set; }
 
-    public virtual Partner Partner { get; set; } = null!;
 
-    public DateOnly? caducateDate => PayDay?.AddMonths(MonthsPaid ?? 0);
+    public DateOnly? caducateDateCalc => PayDay?.AddMonths(MonthsPaid ?? 0);
+}
+
+public partial class UserQuery
+{
+    public int? Id { get; set; } = null;
+    public string? FirstName { get; set; } = null;
+    public string? LastName { get; set; } = null;
+    public string? Email { get; set; } = null;
+    public string? Phone { get; set; } = null;
+    public int? MonthsPaid { get; set; } = null;
+    public bool? Active { get; set; } = null;
+
 }

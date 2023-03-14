@@ -21,8 +21,6 @@ public partial class Partner
     public DateTime? Updated { get; set; }
 
     public bool? Active { get; set; }
-
-    public virtual ICollection<User> Users { get; } = new List<User>();
 }
 
 public class PartnerQuery
@@ -33,4 +31,10 @@ public class PartnerQuery
     public string? Phone { get; set; }
     public bool? Active { get; set; } = null;
 
+}
+
+public class PartnerAuth
+{
+    public string token { get; set; }
+    public Partner data { get; set; }
 }

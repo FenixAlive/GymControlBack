@@ -1,5 +1,6 @@
 ﻿using gymControl.Interfaces;
 using gymControl.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net;
@@ -17,14 +18,23 @@ namespace gymControl.Controllers
             _partnerService = partnerService;
         }
 
-        [HttpGet]
-        [Route("")]
-        public async Task<IActionResult> GetPartner([FromQuery] PartnerQuery query = null)
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> LoginPartner([FromBody] LoginUser loginUser = null)
         {
             try
             {
-                var partner = await _partnerService.GetPartners(query);
-                string json = JsonConvert.SerializeObject(partner);
+                if (loginUser == null || loginUser?.UserName?.Length == 0 || loginUser?.Password?.Length < 4)
+                {
+                    return BadRequest("Payload null or invalid, It should be a valid login object");
+                }
+
+                var result = await _partnerService.LoginPartner(loginUser!);
+                if(result == null)
+                {
+                    return NotFound("Invalid credentials");
+                }
+                string json = JsonConvert.SerializeObject(result);
                 return Content(json, "application/json");
             }
             catch (Exception _)
@@ -32,32 +42,7 @@ namespace gymControl.Controllers
 
                 throw new System.Web.Http.HttpResponseException(HttpStatusCode.InternalServerError);
             }
-            
-        }
 
-        [HttpGet]
-        [Route("authenticate")]
-        public async Task<IActionResult> AuthenticatePartner([FromQuery] string? username = null, [FromQuery] string? passwd = null)
-        {
-            try
-            {
-                if(username == null || passwd == null)
-                {
-                    return BadRequest("username and passwd are required");
-                }
-                var partner = await _partnerService.AuthenticatePartner(username, passwd);
-                if(partner == null)
-                {
-                    return NotFound();
-                }
-                string json = JsonConvert.SerializeObject(partner);
-                return Content(json, "application/json");
-            }
-            catch (Exception _)
-            {
-
-                throw new System.Web.Http.HttpResponseException(HttpStatusCode.InternalServerError);
-            }
         }
 
         [HttpPost]
@@ -83,8 +68,9 @@ namespace gymControl.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         [Route("")]
-        public async Task<IActionResult> RemovePartner([FromBody] Partner partner)
+        public async Task<IActionResult> UpdatePartner([FromBody] Partner partner)
         {
             try
             {
@@ -100,6 +86,7 @@ namespace gymControl.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
         [Route("{id}")]
         public async Task<IActionResult> RemovePartner(int? id = null)
         {
