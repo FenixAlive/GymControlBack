@@ -32,17 +32,18 @@ namespace gymControl.Services
             return result;
         }
 
-        public async Task<User> GetUser(int userId)
+        public async Task<User> GetUser(string partnerId, int userId)
         {
             var response = await _context.Users.FindAsync(userId);
             return response;
         }
 
 
-        public async Task<User> AddUser(User user)
+        public async Task<User> AddUser( User user)
         {
             user.Id = null;
             user.Created = DateTime.UtcNow;
+            user.CaducateDate = user.caducateDateCalc;
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return user;
@@ -57,23 +58,28 @@ namespace gymControl.Services
                 {
                     user.userPass = result.userPass;
                 }
-                else
-                {
-                    user.userPass = PasswdSecure.EncodePasswordToBase64(user.userPass);
-                }
                 if(user.Active == null)
                 {
                     user.Active = result.Active;
                 }
+                if(user.PayDay == null)
+                {
+                    user.PayDay = result.PayDay;
+                }
+                if(user.PartnerId == null)
+                {
+                    user.PartnerId = result.PartnerId;
+                }
                 user.Created = result.Created;
                 user.Updated = DateTime.UtcNow;
+                user.CaducateDate = user.caducateDateCalc;
                 result  = user;
                 await _context.SaveChangesAsync();
             }
             return result;
         }
 
-        public async Task<User> RemoveUser(int? userId)
+        public async Task<User> RemoveUser(int userId)
         {
             var user = new User() { Id = userId};
             _context.Users.Remove(user);

@@ -6,9 +6,9 @@ namespace gymControl.Interfaces
     {
         
         Task<List<User>> GetUsers(string partnerId, UserQuery query);
-        Task<User> GetUser(int userId);
+        Task<User> GetUser(string partnerId, int userId);
         Task<User> AddUser(User user);
-        Task<User> EditUser(User user);
-        Task<User> RemoveUser(int? userId);
+        Task<User> EditUser( User user);
+        Task<User> RemoveUser(int userId);
     }
 }
