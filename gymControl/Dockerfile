@@ -19,4 +19,6 @@ RUN dotnet publish "gymControl.csproj" -c Release -o /app/publish /p:UseAppHost=
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "gymControl.dll"]
+# ENTRYPOINT ["dotnet", "gymControl.dll"]
+# for heroku only
+CMD ASPNETCORE_URLS=http://*:$PORT dotnet gymControl.dll

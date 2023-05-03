@@ -22,6 +22,9 @@
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "environmentVariables": {
+        "DATABASE_PSW": "bCYzI_Dsi9-j0jL7JWq6c1AV9iruod7Z"
+      },
       "publishAllPorts": true,
       "useSSL": true
     }

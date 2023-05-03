@@ -29,9 +29,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 //database connection
-var connectionString = builder.Configuration.GetConnectionString("PostgresqlConnection");
+//string databasePsw = Environment.GetEnvironmentVariable("DATABASE_PSW");
+var connectionString = (string)builder.Configuration.GetConnectionString("PostgresqlConnection");
 builder.Services.AddDbContext<LkyqirhzContext>(options => options.UseNpgsql(connectionString));
 
 var app = builder.Build();
